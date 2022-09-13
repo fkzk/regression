@@ -6,8 +6,9 @@ import matplotlib.pyplot as plt
 x_max = 1
 n_all = 101
 n_train = 10
-n_degree = 3
+n_degree = 11
 random_seed = 0
+c_l2 = 0.005
 
 # y = sin(πx)の計算
 x = jnp.linspace(-x_max, x_max, num=n_all)
@@ -23,7 +24,8 @@ sample_sinx = jnp.sin(jnp.pi*sample_x)
 p = jnp.arange(n_degree+1)
 X = jnp.power(sample_x[:, jnp.newaxis], p[jnp.newaxis, :])
 # 係数の決定
-a = jnp.linalg.inv(X.T @ X) @ X.T @ sample_sinx[:, jnp.newaxis]
+I = jnp.eye(n_degree+1)
+a = jnp.linalg.inv(c_l2 * I + X.T @ X) @ X.T @ sample_sinx[:, jnp.newaxis]
 # すべてのxに対する多項式の計算
 X_all = jnp.power(x[:, jnp.newaxis], p[jnp.newaxis, :])
 poly_x = (X_all @ a)[:]
