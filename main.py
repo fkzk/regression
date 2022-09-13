@@ -24,7 +24,12 @@ ax.scatter(sample_x, sample_sinx, color='red', zorder=2, label='training sample'
 n = 3
 p = jnp.arange(n+1)
 X = jnp.power(sample_x[:, jnp.newaxis], p[jnp.newaxis, :])
-print(X)
+# 係数の決定
+a = jnp.linalg.inv(X.T @ X) @ X.T @ sample_sinx[:, jnp.newaxis]
+# すべてのxに対する多項式の計算・表示
+X_all = jnp.power(x[:, jnp.newaxis], p[jnp.newaxis, :])
+poly_x = (X_all @ a)[:]
+ax.plot(x, poly_x, label='predicted')
 # 凡例の表示・図の出力
 ax.legend()
 fig.savefig('sinx.png')
