@@ -26,16 +26,21 @@ def poly2(x: jnp.ndarray) -> jnp.ndarray:
     """
     return x**2 + 0.5 * x - 0.7
 
+TARGETS = dict(
+    sin=sin,
+    poly2=poly2,
+)
+
 def get_target_fn(name: str) -> Callable[[jnp.ndarray], jnp.ndarray]:
-    """nameに応じたターゲット関数t(x)を返す（予定; 今はpoly2を返す）
+    """nameに応じたターゲット関数t(x)を返す
 
     Args:
         name (str): ターゲット関数の名前
 
     Returns:
-        Callable[[jnp.ndarray], jnp.ndarray]: 現状はpoly2関数を返す
+        Callable[[jnp.ndarray], jnp.ndarray]: nameに応じたターゲット関数
     """
-    return poly2
+    return TARGETS[name]
 
 # 値の初期化
 x_max = 1
