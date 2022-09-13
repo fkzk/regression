@@ -15,16 +15,27 @@ def sin(x: jnp.ndarray) -> jnp.ndarray:
     """
     return jnp.sin(jnp.pi*x)
 
+def poly2(x: jnp.ndarray) -> jnp.ndarray:
+    """x^2 + 0.5x - 0.7を計算
+
+    Args:
+        x (jnp.ndarray): 計算すべきxが1次元に並んだ配列
+
+    Returns:
+        jnp.ndarray: x^2 + 0.5x - 0.7 の計算結果
+    """
+    return x**2 + 0.5 * x - 0.7
+
 def get_target_fn(name: str) -> Callable[[jnp.ndarray], jnp.ndarray]:
-    """nameに応じたターゲット関数t(x)を返す（予定; 今はsinを返す）
+    """nameに応じたターゲット関数t(x)を返す（予定; 今はpoly2を返す）
 
     Args:
         name (str): ターゲット関数の名前
 
     Returns:
-        Callable[[jnp.ndarray], jnp.ndarray]: 現状はsin関数を返す
+        Callable[[jnp.ndarray], jnp.ndarray]: 現状はpoly2関数を返す
     """
-    return sin
+    return poly2
 
 # 値の初期化
 x_max = 1
