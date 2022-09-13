@@ -20,6 +20,11 @@ sample_x = jax.random.uniform(random_key, shape=(10,), minval=-1, maxval=1)
 # サンプル点に対する sin(πx_i)の表示
 sample_sinx = jnp.sin(jnp.pi*sample_x)
 ax.scatter(sample_x, sample_sinx, color='red', zorder=2, label='training sample')
+# サンプル点に対するx^pの計算
+n = 3
+p = jnp.arange(n+1)
+X = jnp.power(sample_x[:, jnp.newaxis], p[jnp.newaxis, :])
+print(X)
 # 凡例の表示・図の出力
 ax.legend()
 fig.savefig('sinx.png')
