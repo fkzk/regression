@@ -38,6 +38,13 @@ ax.set_title(r'$y = \sin (\pi x)$')
 ax.axhline(0, color='#777777')
 ax.axvline(0, color='#777777')
 ax.tick_params(direction='in', bottom=True, top=True, left=True, right=True)
+# 表示範囲の設定
+ax.set_xlim(-x_max, x_max)
+y_min = jnp.min(sinx)
+y_max = jnp.max(sinx)
+ylim_min = y_min - (y_max-y_min) * 0.15
+ylim_max = y_max + (y_max-y_min) * 0.15
+ax.set_ylim(ylim_min, ylim_max)
 # グラフのプロット
 ax.plot(x, sinx, label='target')
 ax.scatter(sample_x, sample_sinx, color='red', zorder=2, label='training sample')
