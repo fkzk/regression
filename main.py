@@ -34,7 +34,7 @@ poly_x = (X_all @ a)[:]
 fig = plt.Figure()
 ax = fig.add_subplot(1, 1, 1, xlabel='x', ylabel='y')
 # グラフの見た目の設定
-ax.set_title(r'$y = \sin (\pi x)$')
+ax.set_title('$y = \sin (\pi x)$')
 ax.axhline(0, color='#777777')
 ax.axvline(0, color='#777777')
 ax.tick_params(direction='in', bottom=True, top=True, left=True, right=True)
@@ -48,7 +48,7 @@ ax.set_ylim(ylim_min, ylim_max)
 # グラフのプロット
 ax.plot(x, sinx, label='target')
 ax.scatter(sample_x, sample_sinx, color='red', zorder=2, label='training sample')
-ax.plot(x, poly_x, label='predicted')
+ax.plot(x, poly_x, label=f'predicted ($d={n_degree}, \lambda={c_l2}$)')
 # 凡例の表示・図の出力
 ax.legend()
 fig.savefig('sinx.png')
