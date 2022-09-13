@@ -3,18 +3,24 @@ import jax.numpy as jnp
 import matplotlib.pyplot as plt
 
 # 値の初期化
-n = 3
+x_max = 1
+n_all = 101
+n_train = 10
+n_degree = 3
+random_seed = 0
 
 # y = sin(πx)の計算
-x = jnp.linspace(-1, 1, num=101)
+x = jnp.linspace(-x_max, x_max, num=n_all)
 sinx = jnp.sin(jnp.pi*x)
 # サンプル点の選出
-random_key = jax.random.PRNGKey(0)
-sample_x = jax.random.uniform(random_key, shape=(10,), minval=-1, maxval=1)
+random_key = jax.random.PRNGKey(random_seed)
+sample_x = jax.random.uniform(
+    random_key, shape=(n_train,), minval=-x_max, maxval=x_max
+)
 # サンプル点に対する sin(πx_i)の計算
 sample_sinx = jnp.sin(jnp.pi*sample_x)
 # サンプル点に対するx^pの計算
-p = jnp.arange(n+1)
+p = jnp.arange(n_degree+1)
 X = jnp.power(sample_x[:, jnp.newaxis], p[jnp.newaxis, :])
 # 係数の決定
 a = jnp.linalg.inv(X.T @ X) @ X.T @ sample_sinx[:, jnp.newaxis]
