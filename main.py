@@ -1,3 +1,5 @@
+from typing import Callable
+
 import jax
 import jax.numpy as jnp
 import matplotlib.pyplot as plt
@@ -13,6 +15,17 @@ def sin(x: jnp.ndarray) -> jnp.ndarray:
     """
     return jnp.sin(jnp.pi*x)
 
+def get_target_fn(name: str) -> Callable[[jnp.ndarray], jnp.ndarray]:
+    """nameに応じたターゲット関数t(x)を返す（予定; 今はsinを返す）
+
+    Args:
+        name (str): ターゲット関数の名前
+
+    Returns:
+        Callable[[jnp.ndarray], jnp.ndarray]: 現状はsin関数を返す
+    """
+    return sin
+
 # 値の初期化
 x_max = 1
 n_all = 101
@@ -21,17 +34,20 @@ n_degree = 11
 random_seed = 0
 c_l2 = 0.005
 noise_rate = 0.05
+target_name = 'sin'
 
+# ターゲット関数の取得
+target_fn = get_target_fn(target_name)
 # y = sin(πx)の計算
 x = jnp.linspace(-x_max, x_max, num=n_all)
-sinx = sin(x)
+sinx = target_fn(x)
 # サンプル点の選出
 random_key = jax.random.PRNGKey(random_seed)
 sample_x = jax.random.uniform(
     random_key, shape=(n_train,), minval=-x_max, maxval=x_max
 )
 # サンプル点に対する sin(πx_i)の計算
-sample_sinx = sin(sample_x)
+sample_sinx = target_fn(sample_x)
 # 学習用サンプルにノイズを加える
 sigma = (jnp.max(sinx) - jnp.min(sinx)) * noise_rate
 _, noise_key = jax.random.split(random_key)
