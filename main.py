@@ -36,6 +36,12 @@ a = jnp.linalg.inv(c_l2 * I + X.T @ X) @ X.T @ sample_sinx[:, jnp.newaxis]
 X_all = jnp.power(x[:, jnp.newaxis], p[jnp.newaxis, :])
 poly_x = (X_all @ a)[:]
 
+# 評価値の計算・表示
+mae = jnp.mean(jnp.abs(sinx-poly_x))
+nmae = mae / (jnp.max(sinx) - jnp.min(sinx))
+score = - 20 * jnp.log10(nmae)
+print(f'近似スコア: {score:.2f} dB')
+
 # 図とグラフの作成
 fig = plt.Figure()
 ax = fig.add_subplot(1, 1, 1, xlabel='x', ylabel='y')
