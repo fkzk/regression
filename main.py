@@ -9,6 +9,7 @@ n_train = 10
 n_degree = 11
 random_seed = 0
 c_l2 = 0.005
+noise_rate = 0.05
 
 # y = sin(πx)の計算
 x = jnp.linspace(-x_max, x_max, num=n_all)
@@ -20,6 +21,11 @@ sample_x = jax.random.uniform(
 )
 # サンプル点に対する sin(πx_i)の計算
 sample_sinx = jnp.sin(jnp.pi*sample_x)
+# 学習用サンプルにノイズを加える
+sigma = (jnp.max(sinx) - jnp.min(sinx)) * noise_rate
+_, noise_key = jax.random.split(random_key)
+noise = jax.random.normal(noise_key, shape=sample_x.shape) * sigma
+sample_sinx = sample_sinx + noise
 # サンプル点に対するx^pの計算
 p = jnp.arange(n_degree+1)
 X = jnp.power(sample_x[:, jnp.newaxis], p[jnp.newaxis, :])
