@@ -2,6 +2,17 @@ import jax
 import jax.numpy as jnp
 import matplotlib.pyplot as plt
 
+def sin(x: jnp.ndarray) -> jnp.ndarray:
+    """sin(πx)を計算
+
+    Args:
+        x (jnp.ndarray): 計算すべきxが1次元に並んだ配列
+    
+    Returns:
+        jnp.ndarray: sin(πx)の計算結果
+    """
+    return jnp.sin(jnp.pi*x)
+
 # 値の初期化
 x_max = 1
 n_all = 101
@@ -13,14 +24,14 @@ noise_rate = 0.05
 
 # y = sin(πx)の計算
 x = jnp.linspace(-x_max, x_max, num=n_all)
-sinx = jnp.sin(jnp.pi*x)
+sinx = sin(x)
 # サンプル点の選出
 random_key = jax.random.PRNGKey(random_seed)
 sample_x = jax.random.uniform(
     random_key, shape=(n_train,), minval=-x_max, maxval=x_max
 )
 # サンプル点に対する sin(πx_i)の計算
-sample_sinx = jnp.sin(jnp.pi*sample_x)
+sample_sinx = sin(sample_x)
 # 学習用サンプルにノイズを加える
 sigma = (jnp.max(sinx) - jnp.min(sinx)) * noise_rate
 _, noise_key = jax.random.split(random_key)
