@@ -48,6 +48,13 @@ class PolyRegressor:
         y_pred = (X @ self.a)[:]
         return y_pred
 
+    def __str__(self) -> str:
+        args = [
+            f'$d={self.n_degree}$',
+            f'$\lambda={self.c_l2}$',
+        ]
+        return f'Poly({", ".join(args)})'
+
 # 値の初期化
 x_max = 1
 n_all = 101
@@ -78,10 +85,10 @@ sample_target = sample_target + noise
 # 回帰の計算
 regressor = PolyRegressor(n_degree, c_l2)
 regressor.train(sample_x, sample_target)
-poly_x = regressor(x)
+y_pred = regressor(x)
 
 # 評価値の計算・表示
-mae = jnp.mean(jnp.abs(target-poly_x))
+mae = jnp.mean(jnp.abs(target-y_pred))
 nmae = mae / (jnp.max(target) - jnp.min(target))
 score = - 20 * jnp.log10(nmae)
 print(f'近似スコア: {score:.2f} dB')
@@ -106,7 +113,7 @@ ax.plot(x, target, label='target')
 ax.scatter(
     sample_x, sample_target, color='red', zorder=2, label='training sample'
 )
-ax.plot(x, poly_x, label=f'predicted ($d={n_degree}, \lambda={c_l2}$)')
+ax.plot(x, y_pred, label=f'predicted {regressor}')
 # 凡例の表示・図の出力
 ax.legend()
 fig.savefig('result.png')
