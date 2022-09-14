@@ -1,5 +1,6 @@
 import jax
 import jax.numpy as jnp
+from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
 
 from regressor import build_regressor
@@ -12,7 +13,7 @@ n_train = 10
 random_seed = 0
 noise_rate = 0.05
 target_name = 'sin'
-regressor_name = 'gp'
+regressor_name = ['poly', 'gp']
 regressor_cfg = dict(
     poly = dict(
         n_degree = 11,
@@ -23,7 +24,6 @@ regressor_cfg = dict(
         sigma = 0.25,
     )
 )
-regressor_kwargs = regressor_cfg[regressor_name]
 
 # ターゲット関数 t の取得
 target_fn = get_target_fn(target_name)
@@ -42,19 +42,28 @@ sigma = (jnp.max(target) - jnp.min(target)) * noise_rate
 _, noise_key = jax.random.split(random_key)
 noise = jax.random.normal(noise_key, shape=sample_x.shape) * sigma
 sample_target = sample_target + noise
+
 # 回帰の計算
-regressor = build_regressor(regressor_name, **regressor_kwargs)
-regressor.train(sample_x, sample_target)
-y_pred = regressor(x)
+if isinstance(regressor_name, str):
+    regressor_name = [regressor_name, ]
+regressor = dict()
+y_pred = dict()
+for reg_name in regressor_name:
+    reg = build_regressor(reg_name, regressor_cfg)
+    regressor[reg_name] = reg
+    reg.train(sample_x, sample_target)
+    y_pred[reg_name] = reg(x)
 
 # 評価値の計算・表示
-mae = jnp.mean(jnp.abs(target-y_pred))
-nmae = mae / (jnp.max(target) - jnp.min(target))
-score = - 20 * jnp.log10(nmae)
-print(f'近似スコア: {score:.2f} dB')
+for reg_name in regressor_name:
+    mae = jnp.mean(jnp.abs(target-y_pred[reg_name]))
+    nmae = mae / (jnp.max(target) - jnp.min(target))
+    score = - 20 * jnp.log10(nmae)
+    print(f'** {regressor[reg_name]} **')
+    print(f'近似スコア: {score:.2f} dB')
 
 # 図とグラフの作成
-fig = plt.Figure()
+fig: Figure = plt.Figure()
 ax = fig.add_subplot(1, 1, 1, xlabel='x', ylabel='y')
 # グラフの見た目の設定
 ax.set_title(f'$y = ${target_name}$ (x)$')
@@ -73,7 +82,8 @@ ax.plot(x, target, label='target')
 ax.scatter(
     sample_x, sample_target, color='red', zorder=2, label='training sample'
 )
-ax.plot(x, y_pred, label=f'predicted {regressor}')
+for reg_name in regressor_name:
+    ax.plot(x, y_pred[reg_name], label=f'predicted {regressor[reg_name]}')
 # 凡例の表示・図の出力
 ax.legend()
 fig.savefig('result.png')
