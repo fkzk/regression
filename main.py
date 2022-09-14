@@ -4,6 +4,50 @@ import matplotlib.pyplot as plt
 
 from target_fn import get_target_fn
 
+class PolyRegressor:
+    """多項式フィッティングで回帰するためのクラス
+    """
+    def __init__(self, n_degree: int, c_l2: float) -> None:
+        """初期化
+
+        Args:
+            n_degree (int): 回帰に使う多項式の次数
+            c_l2 (float): L2正則化の正則化係数
+        """
+        self.n_degree = n_degree
+        self.p = jnp.arange(n_degree+1)
+        self.c_l2 = c_l2
+        self.a = None
+
+    def train(self, sample_x: jnp.ndarray, sample_target: jnp.ndarray) -> None:
+        """入出力のサンプルから多項式の係数を決定する
+
+        Args:
+            sample_x (jnp.ndarray): サンプルの入力となった1次元配列
+            sample_target (jnp.ndarray): sample_xに対応する出力
+        """
+        # サンプル点に対するx^pの計算
+        X = jnp.power(sample_x[:, jnp.newaxis], self.p[jnp.newaxis, :])
+        # 係数の決定
+        I = jnp.eye(self.n_degree+1)
+        self.a = (
+            jnp.linalg.inv(self.c_l2 * I + X.T @ X) @ X.T
+            @ sample_target[:, jnp.newaxis]
+        )
+
+    def __call__(self, x: jnp.ndarray) -> jnp.ndarray:
+        """多項式の計算をする
+
+        Args:
+            x (jnp.ndarray): 多項式に入力する1次元配列
+
+        Returns:
+            jnp.ndarray: 多項式の計算結果。xと同じ要素数の1次元配列
+        """
+        X = jnp.power(x[:, jnp.newaxis], self.p[jnp.newaxis, :])
+        y_pred = (X @ self.a)[:]
+        return y_pred
+
 # 値の初期化
 x_max = 1
 n_all = 101
@@ -31,15 +75,10 @@ sigma = (jnp.max(target) - jnp.min(target)) * noise_rate
 _, noise_key = jax.random.split(random_key)
 noise = jax.random.normal(noise_key, shape=sample_x.shape) * sigma
 sample_target = sample_target + noise
-# サンプル点に対するx^pの計算
-p = jnp.arange(n_degree+1)
-X = jnp.power(sample_x[:, jnp.newaxis], p[jnp.newaxis, :])
-# 係数の決定
-I = jnp.eye(n_degree+1)
-a = jnp.linalg.inv(c_l2 * I + X.T @ X) @ X.T @ sample_target[:, jnp.newaxis]
-# すべてのxに対する多項式の計算
-X_all = jnp.power(x[:, jnp.newaxis], p[jnp.newaxis, :])
-poly_x = (X_all @ a)[:]
+# 回帰の計算
+regressor = PolyRegressor(n_degree, c_l2)
+regressor.train(sample_x, sample_target)
+poly_x = regressor(x)
 
 # 評価値の計算・表示
 mae = jnp.mean(jnp.abs(target-poly_x))
