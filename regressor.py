@@ -51,8 +51,39 @@ class PolyRegressor:
         ]
         return f'Poly({", ".join(args)})'
 
+class GPRegressor:
+    def __init__(self, beta: float, sigma: float) -> None:
+        self.beta = beta
+        self.sigma = sigma
+        self.sample_x = None
+
+    def train(self, sample_x: jnp.ndarray, sample_target: jnp.ndarray) -> None:
+        self.sample_x = sample_x
+        K = self.kernel(sample_x, sample_x)
+        I = jnp.eye(sample_x.shape[0])
+        c = jnp.linalg.inv(K + I / self.beta) @ sample_target[:, jnp.newaxis]
+        self.c = c
+
+    def __call__(self, x: jnp.ndarray) -> jnp.ndarray:
+        k = self.kernel(x, self.sample_x)
+        mu = (k @ self.c)[:]
+        return mu
+
+    def kernel(self, x_row: jnp.ndarray, x_col: jnp.ndarray) -> jnp.ndarray:
+        diff = x_row[:, jnp.newaxis] - x_col[jnp.newaxis, :]
+        gaussian = jnp.exp(-(diff**2)/(2*self.sigma**2))
+        return gaussian
+
+    def __str__(self) -> str:
+        args = [
+            f'$\\beta={self.beta}$',
+            f'$\sigma={self.sigma}$',
+        ]
+        return f'GP({", ".join(args)})'
+
 __REGRESSORS = dict(
     poly=PolyRegressor,
+    gp=GPRegressor,
 )
 
 def build_regressor(name, **init_kwargs):

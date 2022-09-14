@@ -12,12 +12,16 @@ n_train = 10
 random_seed = 0
 noise_rate = 0.05
 target_name = 'sin'
-regressor_name = 'poly'
+regressor_name = 'gp'
 regressor_cfg = dict(
     poly = dict(
         n_degree = 11,
         c_l2 = 0.005,
     ),
+    gp = dict(
+        beta = 10,
+        sigma = 0.25,
+    )
 )
 regressor_kwargs = regressor_cfg[regressor_name]
 
