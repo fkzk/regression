@@ -86,7 +86,8 @@ __REGRESSORS = dict(
     gp=GPRegressor,
 )
 
-def build_regressor(name, **init_kwargs):
+def build_regressor(name, init_cfg):
     regressor_cls = __REGRESSORS[name]
+    init_kwargs = init_cfg[name]
     regressor = regressor_cls(**init_kwargs)
     return regressor
