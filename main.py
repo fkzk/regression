@@ -2,17 +2,24 @@ import jax
 import jax.numpy as jnp
 import matplotlib.pyplot as plt
 
+from regressor import build_regressor
 from target_fn import get_target_fn
 
 # 値の初期化
 x_max = 1
 n_all = 101
 n_train = 10
-n_degree = 11
 random_seed = 0
-c_l2 = 0.005
 noise_rate = 0.05
 target_name = 'sin'
+regressor_name = 'poly'
+regressor_cfg = dict(
+    poly = dict(
+        n_degree = 11,
+        c_l2 = 0.005,
+    ),
+)
+regressor_kwargs = regressor_cfg[regressor_name]
 
 # ターゲット関数 t の取得
 target_fn = get_target_fn(target_name)
@@ -31,18 +38,13 @@ sigma = (jnp.max(target) - jnp.min(target)) * noise_rate
 _, noise_key = jax.random.split(random_key)
 noise = jax.random.normal(noise_key, shape=sample_x.shape) * sigma
 sample_target = sample_target + noise
-# サンプル点に対するx^pの計算
-p = jnp.arange(n_degree+1)
-X = jnp.power(sample_x[:, jnp.newaxis], p[jnp.newaxis, :])
-# 係数の決定
-I = jnp.eye(n_degree+1)
-a = jnp.linalg.inv(c_l2 * I + X.T @ X) @ X.T @ sample_target[:, jnp.newaxis]
-# すべてのxに対する多項式の計算
-X_all = jnp.power(x[:, jnp.newaxis], p[jnp.newaxis, :])
-poly_x = (X_all @ a)[:]
+# 回帰の計算
+regressor = build_regressor(regressor_name, **regressor_kwargs)
+regressor.train(sample_x, sample_target)
+y_pred = regressor(x)
 
 # 評価値の計算・表示
-mae = jnp.mean(jnp.abs(target-poly_x))
+mae = jnp.mean(jnp.abs(target-y_pred))
 nmae = mae / (jnp.max(target) - jnp.min(target))
 score = - 20 * jnp.log10(nmae)
 print(f'近似スコア: {score:.2f} dB')
@@ -67,7 +69,7 @@ ax.plot(x, target, label='target')
 ax.scatter(
     sample_x, sample_target, color='red', zorder=2, label='training sample'
 )
-ax.plot(x, poly_x, label=f'predicted ($d={n_degree}, \lambda={c_l2}$)')
+ax.plot(x, y_pred, label=f'predicted {regressor}')
 # 凡例の表示・図の出力
 ax.legend()
 fig.savefig('result.png')
