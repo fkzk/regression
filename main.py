@@ -4,8 +4,10 @@ import numpy as np
 def main():
     x = np.linspace(-1, 1, 101)
     y = np.sin(np.pi * x)
+    y_range = np.max(y) - np.min(y)
     sample_x = np.random.uniform(-1, 1, (20, ))
-    sample_y = np.sin(np.pi * sample_x)
+    sample_noise = np.random.normal(0, y_range*0.05, (20, ) )
+    sample_y = np.sin(np.pi * sample_x) + sample_noise
     fig = Figure()
     ax = fig.add_subplot(1, 1, 1, xlabel='$x$', ylabel='$y$')
     ax.set_title(r'$y = \sin (\pi x)$')
