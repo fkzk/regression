@@ -17,8 +17,9 @@ def main():
     sample_X = sample_x[:, np.newaxis] ** p[np.newaxis, :]
     sample_XX_inv = np.linalg.inv(sample_X.T @ sample_X)
     a =  sample_XX_inv @ sample_X.T @ sample_y[:, np.newaxis]
-    print(f'{a = }')
     ## 求めた係数を用いて y の値を予測
+    X = x[:, np.newaxis] ** p[np.newaxis, :]
+    y_pred = (X @ a)[:]
     # グラフの表示
     fig = Figure()
     ax = fig.add_subplot(1, 1, 1, xlabel='$x$', ylabel='$y$')
@@ -27,6 +28,7 @@ def main():
     ax.axvline(0, color='#777777')
     ax.plot(x, y, label='真の関数 $f$')
     ax.scatter(sample_x, sample_y, color='red', label='学習サンプル')
+    ax.plot(x, y_pred, label=r'回帰関数 $\hat{f}$')
     ax.legend()
     fig.savefig('out.png')
 
