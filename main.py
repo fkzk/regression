@@ -15,9 +15,9 @@ def main():
     d = 3
     p = np.arange(d+1)
     sample_X = sample_x[:, np.newaxis] ** p[np.newaxis, :]
-    print(f'{sample_x[:, np.newaxis] = }')
-    print(f'{p[np.newaxis, :] = }')
-    print(f'{sample_X = }')
+    sample_XX_inv = np.linalg.inv(sample_X.T @ sample_X)
+    a =  sample_XX_inv @ sample_X.T @ sample_y[:, np.newaxis]
+    print(f'{a = }')
     ## 求めた係数を用いて y の値を予測
     # グラフの表示
     fig = Figure()
