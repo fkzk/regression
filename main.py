@@ -16,15 +16,17 @@ def main():
     p = np.arange(d+1)[np.newaxis, :]
     eps = 1e-8
     n_split = 16
+    eye = np.eye(n_split, n_split)
     def quantitize(xs, ys, alpha=-1, beta=1):
         x_split = np.linspace(alpha, beta, n_split+1)[:, np.newaxis]
-        x_filter = np.where(x_split > xs.T, 1, 0)
-        y_map = x_filter[1:, :] - x_filter[:-1, :]
+        x_min = (x_split[0] + x_split[1]) / 2
+        x_max = (x_split[-2] + x_split[-1]) / 2
+        _xs = (np.squeeze(xs) - x_min) * ((n_split-1) / (x_max - x_min))
+        y_map = eye[np.round(_xs).astype(int)].T
         y_map_sum = np.sum(y_map, axis=1, keepdims=True) 
         if np.all(y_map_sum):
-            y_map = y_map / y_map_sum
             xs = (x_split[:-1] + x_split[1:]) / 2
-            ys = y_map @ ys
+            ys = (y_map @ ys) / y_map_sum
         return xs, ys
     def non_quantitize(xs, ys):
         return xs, ys
