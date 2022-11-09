@@ -16,7 +16,11 @@ def main():
     p = np.arange(d+1)[np.newaxis, :]
     eps = 1e-8
     n_split = 16
+    n_max = 65536
     def quantitize(xs, ys, alpha=-1, beta=1):
+        if xs.size > n_max:
+            xs = xs[:n_max]
+            ys = ys[:n_max]
         x_split = np.linspace(alpha, beta, n_split+1)[:, np.newaxis]
         x_min = (x_split[0] + x_split[1]) / 2
         x_max = (x_split[-2] + x_split[-1]) / 2
@@ -37,6 +41,9 @@ def main():
         sample_x = np.random.uniform(-1, 1, (N, n_repeat))
         sample_noise = np.random.normal(0, y_range*0.05, (N, n_repeat) )
         sample_y = np.sin(np.pi * sample_x) + sample_noise
+        if sample_x.size > n_max:
+            sample_x = sample_x[:n_max]
+            sample_y = sample_y[:n_max]
         for i_repeat in range(n_repeat):
             # 多項式フィッティング
             ## 学習サンプルから係数を求める
