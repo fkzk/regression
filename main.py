@@ -16,18 +16,20 @@ def main():
     p = np.arange(d+1)[np.newaxis, :]
     eps = 1e-8
     n_split = 16
-    eye = np.eye(n_split, n_split)
     def quantitize(xs, ys, alpha=-1, beta=1):
         x_split = np.linspace(alpha, beta, n_split+1)[:, np.newaxis]
         x_min = (x_split[0] + x_split[1]) / 2
         x_max = (x_split[-2] + x_split[-1]) / 2
         _xs = (np.squeeze(xs) - x_min) * ((n_split-1) / (x_max - x_min))
-        y_map = eye[np.round(_xs).astype(int)].T
-        y_map_sum = np.sum(y_map, axis=1, keepdims=True) 
-        if np.all(y_map_sum):
-            xs = (x_split[:-1] + x_split[1:]) / 2
-            ys = (y_map @ ys) / y_map_sum
-        return xs, ys
+        _xs = np.round(_xs).astype(int)
+        _ys = np.empty((n_split, 1))
+        for i in range(n_split):
+            __ys: np.ndarray = ys[_xs == i, 0]
+            if __ys.size == 0:
+                return xs, ys
+            _ys[i, 0] = np.mean(__ys)
+        xs = (x_split[:-1] + x_split[1:]) / 2
+        return xs, _ys
     def non_quantitize(xs, ys):
         return xs, ys
 
@@ -81,6 +83,19 @@ def main():
     ax.axhline(color="#777777")
     ax.plot(Ns, ss, label='真の関数 $f$')
     fig_s.savefig('score.png')
+    fig = Figure()
+    ax = fig.add_subplot(1, 1, 1, xlabel='$x$', ylabel='$y$')
+    ax.set_title(r'$y = \sin (\pi x)$')
+    ax.axhline(0, color='#777777')
+    ax.axvline(0, color='#777777')
+    for x__ in np.linspace(-1, 1, n_split+1):
+        ax.axvline(x__, color='#77aa77')
+    ax.plot(x, y, label='真の関数 $f$')
+    ax.scatter(sample_x, sample_y, color='#ffdddd', label='学習サンプル')
+    ax.scatter(_sample_x, _sample_y, color='red', label='学習サンプルの区間平均')
+    ax.plot(x, y_pred, label=r'回帰関数 $\hat{f}$')
+    ax.legend()
+    fig.savefig('out.png')
 
 if __name__ == '__main__':
     main()
