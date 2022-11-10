@@ -18,9 +18,6 @@ def main():
     n_split = 32
     n_max = 65536
     def quantitize(xs, ys, alpha=-1, beta=1):
-        if xs.size > n_max:
-            xs = xs[:n_max]
-            ys = ys[:n_max]
         x_split = np.linspace(alpha, beta, n_split+1)[:, np.newaxis]
         x_min = (x_split[0] + x_split[1]) / 2
         x_max = (x_split[-2] + x_split[-1]) / 2
@@ -46,9 +43,9 @@ def main():
                 sample_x = np.random.uniform(-1, 1, (N, n_repeat))
                 sample_noise = np.random.normal(0, y_range*0.05, (N, n_repeat) )
                 sample_y = np.sin(np.pi * sample_x) + sample_noise
-                if use_limit_n_sample and sample_x.size > n_max:
-                    sample_x = sample_x[:n_max]
-                    sample_y = sample_y[:n_max]
+                if use_limit_n_sample and N > n_max:
+                    sample_x = sample_x[:n_max, :]
+                    sample_y = sample_y[:n_max, :]
                 for i_repeat in range(n_repeat):
                     # 多項式フィッティング
                     ## 学習サンプルから係数を求める
@@ -81,11 +78,11 @@ def main():
     )
     ax.set_title(r'学習サンプル数$N$とパラメータ推定時間$t$の関係')
     ax.set_xscale('log')
-    ax.set_yscale('linear')
+    ax.set_yscale('log')
     ax.axhline(color="#777777")
     for i_split, use_split in enumerate((False, True)):
         for i_limit, use_limit_n_sample in enumerate((False, True)):
-            i_cond = i_split * 2 + i_limit
+            i_cond = (1-i_split) * 2 + (1-i_limit)
             label_limit = f'$N_{{\\mathrm{{max}}}}={n_max}$'
             label_split = f'$N_{{\\mathrm{{split}}}}={n_split}$'
             if use_split and use_limit_n_sample:
@@ -107,11 +104,11 @@ def main():
     )
     ax.set_title(r'学習サンプル数$N$と評価指標$s$の関係')
     ax.set_xscale('log')
-    ax.set_yscale('linear')
+    ax.set_yscale('log')
     ax.axhline(color="#777777")
     for i_split, use_split in enumerate((False, True)):
         for i_limit, use_limit_n_sample in enumerate((False, True)):
-            i_cond = i_split * 2 + i_limit
+            i_cond = (1-i_split) * 2 + (1-i_limit)
             label_limit = f'$N_{{\\mathrm{{max}}}}={n_max}$'
             label_split = f'$N_{{\\mathrm{{split}}}}={n_split}$'
             if use_split and use_limit_n_sample:
