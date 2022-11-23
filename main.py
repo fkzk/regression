@@ -43,7 +43,7 @@ def main():
     n_test = 101
     noise_ratio = 0.05
     score_eps = 1e-8
-    # 多項式フィッティングの設定
+    # 回帰分析に関する設定
     regressor_name = 'poly'
     regressor_kwargs = dict(
         poly = dict(
@@ -58,7 +58,7 @@ def main():
     x_sample = np.random.uniform(x_min, x_max, (n_train, ))
     noise_sample = np.random.normal(0, range_y*noise_ratio, (n_train, ) )
     y_sample = np.sin(np.pi * x_sample) + noise_sample
-    # 多項式フィッティング
+    # 回帰分析
     ## 学習サンプルから係数を求める
     regressor.fit(x_sample, y_sample)
     ## 求めた係数を用いて y の値を予測
