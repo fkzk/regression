@@ -2,7 +2,7 @@ from matplotlib.figure import Figure
 import japanize_matplotlib as _
 import numpy as np
 
-from regressor import PolyRegressor
+from regressor import build_regressor
 
 def calculate_score(y, y_pred, score_eps):
     norm_y = np.sum(np.abs(y))
@@ -44,8 +44,13 @@ def main():
     noise_ratio = 0.05
     score_eps = 1e-8
     # 多項式フィッティングの設定
-    d = 3
-    regressor = PolyRegressor(d)
+    regressor_name = 'poly'
+    regressor_kwargs = dict(
+        poly = dict(
+            d = 3,
+        ),
+    )
+    regressor = build_regressor(regressor_name, regressor_kwargs)
     # 変数の準備
     x = np.linspace(x_min, x_max, n_test)
     y = np.sin(np.pi * x)

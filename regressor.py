@@ -15,3 +15,10 @@ class PolyRegressor:
         y_pred = np.squeeze(X @ self.a)
         return y_pred
 
+def build_regressor(name, kwargs_all):
+    REGRESSORS = dict(
+        poly=PolyRegressor,
+    )
+    regressor_cls = REGRESSORS[name]
+    kwargs = kwargs_all[name]
+    return regressor_cls(**kwargs)
