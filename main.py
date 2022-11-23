@@ -3,16 +3,24 @@ import japanize_matplotlib as _
 import numpy as np
 
 def main():
-    # 初期設定
-    x = np.linspace(-1, 1, 101)
+    # 実験条件
+    x_min = -1
+    x_max = 1
+    n_train = 20
+    n_test = 101
+    noise_ratio = 0.05
+    score_eps = 1e-8
+    # 多項式フィッティングの設定
+    d = 3
+    # 変数の準備
+    x = np.linspace(x_min, x_max, n_test)
     y = np.sin(np.pi * x)
     y_range = np.max(y) - np.min(y)
-    sample_x = np.random.uniform(-1, 1, (20, ))
-    sample_noise = np.random.normal(0, y_range*0.05, (20, ) )
+    sample_x = np.random.uniform(x_min, x_max, (n_train, ))
+    sample_noise = np.random.normal(0, y_range*noise_ratio, (n_train, ) )
     sample_y = np.sin(np.pi * sample_x) + sample_noise
     # 多項式フィッティング
     ## 学習サンプルから係数を求める
-    d = 3
     p = np.arange(d+1)
     sample_X = sample_x[:, np.newaxis] ** p[np.newaxis, :]
     sample_XX_inv = np.linalg.inv(sample_X.T @ sample_X)
@@ -23,8 +31,7 @@ def main():
     # 評価指標の算出
     norm_y = np.sum(np.abs(y))
     norm_diff = np.sum(np.abs(y - y_pred))
-    eps = 1e-8
-    score = norm_diff / (norm_y + eps)
+    score = norm_diff / (norm_y + score_eps)
     print(f'{score = :.3f}')
     # グラフの表示
     fig = Figure()
