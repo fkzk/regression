@@ -33,6 +33,21 @@ def save_graph(
     ax.legend()
     fig.savefig(filename)
 
+class PolyRegressor:
+    def __init__(self, d):
+        self.d = d
+        self.p = np.arange(d+1)[np.newaxis, :] # 1 x (d+1)
+
+    def fit(self, x_sample, y_sample):
+        X_sample = x_sample[:, np.newaxis] ** self.p
+        XX_inv_sample = np.linalg.inv(X_sample.T @ X_sample)
+        self.a =  XX_inv_sample @ X_sample.T @ y_sample[:, np.newaxis]
+
+    def predict(self, x):
+        X = x[:, np.newaxis] ** self.p
+        y_pred = np.squeeze(X @ self.a)
+        return y_pred
+
 def main():
     # 実験条件
     x_min = -1
@@ -43,28 +58,25 @@ def main():
     score_eps = 1e-8
     # 多項式フィッティングの設定
     d = 3
+    regressor = PolyRegressor(d)
     # 変数の準備
     x = np.linspace(x_min, x_max, n_test)
     y = np.sin(np.pi * x)
-    y_range = np.max(y) - np.min(y)
-    sample_x = np.random.uniform(x_min, x_max, (n_train, ))
-    sample_noise = np.random.normal(0, y_range*noise_ratio, (n_train, ) )
-    sample_y = np.sin(np.pi * sample_x) + sample_noise
+    range_y = np.max(y) - np.min(y)
+    x_sample = np.random.uniform(x_min, x_max, (n_train, ))
+    noise_sample = np.random.normal(0, range_y*noise_ratio, (n_train, ) )
+    y_sample = np.sin(np.pi * x_sample) + noise_sample
     # 多項式フィッティング
     ## 学習サンプルから係数を求める
-    p = np.arange(d+1)
-    sample_X = sample_x[:, np.newaxis] ** p[np.newaxis, :]
-    sample_XX_inv = np.linalg.inv(sample_X.T @ sample_X)
-    a =  sample_XX_inv @ sample_X.T @ sample_y[:, np.newaxis]
+    regressor.fit(x_sample, y_sample)
     ## 求めた係数を用いて y の値を予測
-    X = x[:, np.newaxis] ** p[np.newaxis, :]
-    y_pred = np.squeeze(X @ a)
+    y_pred = regressor.predict(x)
     # 評価指標の算出
     score = calculate_score(y, y_pred, score_eps)
     print(f'{score = :.3f}')
     # グラフの表示
     save_graph(
-        xy=(x, y), xy_sample=(sample_x, sample_y), xy_pred=(x, y_pred),
+        xy=(x, y), xy_sample=(x_sample, y_sample), xy_pred=(x, y_pred),
         title=r'$y = \sin (\pi x)$'
     )
 
