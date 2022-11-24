@@ -1,5 +1,6 @@
 import numpy as np
 from matplotlib.figure import Figure
+import japanize_matplotlib as _
 
 def main():
     # x, f(x)の準備
@@ -18,8 +19,9 @@ def main():
     ax.set_ylabel('$y$')
     ax.axhline(color='#777777')
     ax.axvline(color='#777777')
-    ax.plot(x, y)
-    ax.scatter(x_sample, y_sample, color='red')
+    ax.plot(x, y, label='真の関数 $f$')
+    ax.scatter(x_sample, y_sample, color='red', label='学習サンプル')
+    ax.legend()
     fig.savefig('out.png')
 
 if __name__ == '__main__':
