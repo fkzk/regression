@@ -11,6 +11,15 @@ def main():
     range_y = np.max(y) - np.min(y)
     noise_sample = np.random.normal(0, range_y*0.05, (20, ))
     y_sample = np.sin(np.pi * x_sample) + noise_sample
+    # 多項式フィッティング
+    ## Xを作る
+    d = 3
+    p = np.arange(d+1)[np.newaxis, :]
+    x_s = x_sample[:, np.newaxis]
+    X_s = x_s ** p
+    print(p)
+    print(x_s)
+    print(X_s)
     # グラフの作成
     fig = Figure()
     ax = fig.add_subplot(1, 1, 1)
