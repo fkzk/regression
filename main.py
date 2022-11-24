@@ -11,6 +11,18 @@ def main():
     range_y = np.max(y) - np.min(y)
     noise_sample = np.random.normal(0, range_y*0.05, (20, ))
     y_sample = np.sin(np.pi * x_sample) + noise_sample
+    # 多項式フィッティング
+    ## Xを作る
+    d = 3
+    p = np.arange(d+1)[np.newaxis, :]
+    x_s = x_sample[:, np.newaxis]
+    X_s = x_s ** p
+    ## 係数aを求める
+    y_s = y_sample[:, np.newaxis]
+    X_inv = np.linalg.inv(X_s.T @ X_s)
+    a = X_inv @ X_s.T @ y_s
+    ## yの予測値を計算
+    y_pred = (x[:, np.newaxis] ** p) @ a
     # グラフの作成
     fig = Figure()
     ax = fig.add_subplot(1, 1, 1)
@@ -21,6 +33,7 @@ def main():
     ax.axvline(color='#777777')
     ax.plot(x, y, label='真の関数 $f$')
     ax.scatter(x_sample, y_sample, color='red', label='学習サンプル')
+    ax.plot(x, y_pred, label='回帰関数 $\\hat{f}$')
     ax.legend()
     fig.savefig('out.png')
 
