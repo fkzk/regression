@@ -17,9 +17,12 @@ def main():
     p = np.arange(d+1)[np.newaxis, :]
     x_s = x_sample[:, np.newaxis]
     X_s = x_s ** p
-    print(p)
-    print(x_s)
-    print(X_s)
+    ## 係数aを求める
+    y_s = y_sample[:, np.newaxis]
+    print(y_s)
+    X_inv = np.linalg.inv(X_s.T @ X_s)
+    a = X_inv @ X_s.T @ y_s
+    print(a)
     # グラフの作成
     fig = Figure()
     ax = fig.add_subplot(1, 1, 1)
