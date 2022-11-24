@@ -22,7 +22,13 @@ def main():
     X_inv = np.linalg.inv(X_s.T @ X_s)
     a = X_inv @ X_s.T @ y_s
     ## yの予測値を計算
-    y_pred = (x[:, np.newaxis] ** p) @ a
+    y_pred = np.squeeze((x[:, np.newaxis] ** p) @ a)
+    # 評価指標の計算
+    norm_diff = np.sum(np.abs(y - y_pred))
+    norm_y = np.sum(np.abs(y))
+    eps_score = 1e-8
+    score = norm_diff / (norm_y + eps_score)
+    print(f'{score = :.3f}')
     # グラフの作成
     fig = Figure()
     ax = fig.add_subplot(1, 1, 1)
