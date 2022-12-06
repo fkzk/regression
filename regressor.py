@@ -60,10 +60,24 @@ class GPRegressor(Regressor):
     def _gaussian(self, col, row) -> np.ndarray:
         return np.exp(- (col - row) ** 2 / (2 * self.sigma_x ** 2))
 
+class NNRegressor(Regressor):
+    def __init__(self, n_layer, n_dim, learning_rate, epoch):
+        self.n_layer = n_layer
+        self.n_dim = n_dim
+        self.learning_rate = learning_rate
+        self.epoch = epoch
+
+    def fit(self, x_sample: np.ndarray, y_sample: np.ndarray):
+        ...
+
+    def predict(self, x):
+        return x
+
 def build_regressor(name, kwargs_all) -> Regressor:
     REGRESSORS = dict(
         poly=PolyRegressor,
         gp=GPRegressor,
+        nn=NNRegressor,
     )
     regressor_cls = REGRESSORS[name]
     kwargs = kwargs_all[name]

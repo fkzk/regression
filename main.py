@@ -44,7 +44,7 @@ def main():
     noise_ratio = 0.05
     score_eps = 1e-8
     # 回帰分析に関する設定
-    regressor_name = 'gp'
+    regressor_name = 'nn'
     regressor_kwargs = dict(
         poly = dict(
             d = 3,
@@ -53,6 +53,12 @@ def main():
             sigma_x = 0.2,
             sigma_y = 0.1,
         ),
+        nn = dict(
+            n_layer=2,
+            n_dim=20,
+            learning_rate=0.1,
+            epoch=100,
+        )
     )
     regressor = build_regressor(regressor_name, regressor_kwargs)
     # 変数の準備
