@@ -25,13 +25,13 @@ def save_graph(
     ax.axvline(color='#777777')
     if xy is not None:
         x, y = xy # (x, y)のアンパック
-        ax.plot(x, y, label='真の関数 $f$')
+        ax.plot(x, y, color='C0', label='真の関数 $f$')
     if xy_sample is not None:
         x_sample, y_sample = xy_sample
         ax.scatter(x_sample, y_sample, color='red', label='学習サンプル')
     if xy_pred is not None:
         x, y_pred = xy_pred
-        ax.plot(x, y_pred, label='回帰関数 $\\hat{f}$')
+        ax.plot(x, y_pred, color='C1', label='回帰関数 $\\hat{f}$')
     ax.legend()
     fig.savefig(filename)
 
