@@ -19,3 +19,10 @@ class PolyRegressor:
         y_pred = np.squeeze((x[:, np.newaxis] ** self.p) @ self.a)
         return y_pred
 
+def build_regressor(regressor_name, regressor_kwargs):
+    REGRESSORS = dict(
+        poly = PolyRegressor,
+    )
+    regressor_cls = REGRESSORS[regressor_name]
+    init_kwargs = regressor_kwargs[regressor_name]
+    return regressor_cls(**init_kwargs)
